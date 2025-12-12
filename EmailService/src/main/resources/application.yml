@@ -17,7 +17,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: ${email.sender}
-    password: bpel ppwt cekx zens
+    password: ##password##
     properties:
       mail:
         smtp:
@@ -26,8 +26,8 @@ spring:
             enable: true
 
 email:
-  sender: "tushar.ranjan2401@gmail.com"
-  receiver: "19410121126.i.tusharranjan@gmail.com"
+  sender: ##sender-email##
+  receiver: ##receiver-email##
 
 app:
   topics:
