@@ -1,0 +1,81 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: email-service
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: email-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${email.sender}
+    password: bpel ppwt cekx zens
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+email:
+  sender: "tushar.ranjan2401@gmail.com"
+  receiver: "19410121126.i.tusharranjan@gmail.com"
+
+app:
+  topics:
+    notification-email-events: notification.email.events
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+
+feign:
+  circuitbreaker:
+    enabled: true
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10            # look at last 10 calls
+        failure-rate-threshold: 50         # % of failures to open the breaker
+        wait-duration-in-open-state: 10s   # how long to stay open before half-open
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+    instances:
+      inventoryServiceCB:
+        base-config: default
+      shipmentServiceCB:
+        base-config: default
+
+  retry:
+    instances:
+      inventoryServiceCB:
+        max-attempts: 3
+        wait-duration: 500ms
+      shipmentServiceCB:
+        max-attempts: 3
+        wait-duration: 500ms
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,beans
+  endpoint:
+    health:
+      show-details: always

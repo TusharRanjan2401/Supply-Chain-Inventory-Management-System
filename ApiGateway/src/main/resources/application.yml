@@ -1,0 +1,89 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: apigateway
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true   # EMAILSERVICE -> emailservice
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"   # your Vite dev server
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+      routes:
+
+        - id: order-service
+          uri: lb://orderservice          # ORDERSERVICE in Eureka
+          predicates:
+            - Path=/api/orders/**
+#          filters:
+#            - name: CircuitBreaker
+#              args:
+#                name: orderServiceCB
+#                fallbackUri: forward:/fallback/order
+
+        - id: inventory-service
+          uri: lb://inventoryservice      # INVENTORYSERVICE
+          predicates:
+            - Path=/api/inventory/**
+#          filters:
+#            - name: CircuitBreaker
+#              args:
+#                name: inventoryServiceCB
+#                fallbackUri: forward:/fallback/inventory
+
+        - id: shipment-service
+          uri: lb://shipmentservice       # SHIPMENTSERVICE
+          predicates:
+            - Path=/api/shipment/**       # you already use /api/shipment
+#          filters:
+#            - name: CircuitBreaker
+#              args:
+#                name: shipmentServiceCB
+#                fallbackUri: forward:/fallback/shipment
+
+        - id: notification-service
+          uri: lb://notificationservice   # NOTIFICATIONSERVICE
+          predicates:
+            - Path=/api/notifications/**
+#          filters:
+#            - name: CircuitBreaker
+#              args:
+#                name: notificationServiceCB
+#                fallbackUri: forward:/fallback/notification
+
+        - id: email-service
+          uri: lb://emailservice          # EMAILSERVICE
+          predicates:
+            - Path=/api/email/**
+#          filters:
+#            - name: CircuitBreaker
+#              args:
+#                name: emailServiceCB
+#                fallbackUri: forward:/fallback/email
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
